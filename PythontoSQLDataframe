@@ -1,0 +1,52 @@
+import pandas as pd
+import pyodbc
+
+sql_conn = pyodbc.connect('''DRIVER={ODBC Driver 13 for SQL Server};
+                            SERVER=[Your Server Name];
+                            DATABASE=[Your Database Name];
+                            Trusted_Connection=yes''')
+
+query = "SELECT * FROM Sales.SalesOrderDetail"
+
+df = pd.read_sql(query, sql_conn)
+
+#View the data in the df
+df
+
+#View top 10 rows of the df
+df.head(10)
+
+#View bottom 10 rows of the df
+df.tail(10)
+
+#Create New Empty column
+df["New Column"] = ""
+
+#Rename a Column
+df.rename(columns={'LineTotal':'Price (Calc col)'}, inplace=True)
+
+#Delete a Column
+df.drop(['City Name'],axis=1, inplace=True)
+
+#create Calculated Column
+df['Price'] = df.apply(lambda row: row.OrderQty*row.UnitPrice, axis = 1)
+
+# Get a Single Column from df
+pd.Series(df['Price (Calc col)'])
+
+#Count of columns
+df.shape[1]
+
+#Count of rows
+df.shape[0]
+
+# Max Value in the Column
+max(pd.Series(df['Price (Calc col)']))
+
+# Min Value in the Column
+min(pd.Series(df['Price (Calc col)']))
+
+# Sum of Values in the Column
+sum(pd.Series(df['Price (Calc col)']))
+
+df.groupby(['Price (Calc col)']).mean()
